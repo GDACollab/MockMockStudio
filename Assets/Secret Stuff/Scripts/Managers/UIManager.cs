@@ -22,14 +22,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI body;
     [SerializeField] TextMeshProUGUI author;
     [SerializeField] Button closeButton;
-    [SerializeField] Button closeButton;
     [Header("Journal")]
     public Journal journal;
     
     // Internal Variables
     bool _isPaused = false;
     bool _isReading = false;
-    Player _player;
     Player _player;
     
     private void Awake() {
@@ -51,7 +49,7 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(_player._playerInput.currentControlScheme == "Keyboard"){
+        if(_player.currentControlScheme == "Keyboard"){
             keyboardControls.SetActive(true);
             gamepadControls.SetActive(false);
         }
@@ -79,13 +77,13 @@ public class UIManager : MonoBehaviour
     
     void EnableUI(){
         Time.timeScale = 0f;
-        _player._playerInput.SwitchCurrentActionMap("UI");
+        _player.SwitchCurrentActionMap("UI");
         darkBackground.SetActive(true);
     }
     
     void DisableUI(){
         Time.timeScale = 1f;
-        _player._playerInput.SwitchCurrentActionMap("Main");
+        _player.SwitchCurrentActionMap("Main");
         darkBackground.SetActive(false);
     }
     

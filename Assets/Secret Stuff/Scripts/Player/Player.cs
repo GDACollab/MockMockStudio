@@ -2,11 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class Player : MonoBehaviour
 {
@@ -47,32 +45,6 @@ public class Player : MonoBehaviour
     PlayerInput _playerInput;
     InputAction _moveAction, _jumpAction, _dashAction, _interactAction;
     
-    [Header("Movement")]
-    [SerializeField] float groundSpeed = 5f;
-    [SerializeField] float jumpHeight = 5f;
-    [SerializeField] float jumpTime = 1f;
-    [SerializeField] float calcJumpTime = 0f;
-    
-    [Header("Interaction")]
-    [SerializeField] LayerMask interactLayerMask;
-    
-    float jumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*jumpHeight);
-    
-    public Action Pause, Cancel;
-
-    
-    // Internal Variables
-    float _jumpTimer = 0f;
-    float _extraGravity = 0f;
-    
-    // Internal Components
-    Rigidbody2D _rb;
-    SpriteRenderer _sprite;
-    BoxCollider2D _collider;
-    
-    public PlayerInput _playerInput;
-    InputAction _moveAction, _jumpAction, _dashAction, _interactAction;
-
     AudioClip walkAudio, jumpAudio, hitAudio, paperAudio;
     AudioSource mySource;
     bool walkSoundReady = false;
