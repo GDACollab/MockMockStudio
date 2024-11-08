@@ -59,7 +59,6 @@ public class CoreAssetLoader : MonoBehaviour
         getRandomSound(ref jumpSound, "Assets/CONTENT/Sound/Jump");
         getRandomSound(ref paperPickupSound, "Assets/CONTENT/Sound/Pickup Paper");
         getRandomSound(ref takeDamageSound, "Assets/CONTENT/Sound/Take Damage");
-        getRandomSound(ref enemyBarkSound, "Assets/CONTENT/Sound/Enemy Bark");
 
         // Get programming
         getRandomScript(ref enemyScript, "Assets/CONTENT/Programming");

@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class Player : MonoBehaviour
 {
@@ -33,7 +36,11 @@ public class Player : MonoBehaviour
     
     PlayerInput _playerInput;
     InputAction _moveAction, _jumpAction, _dashAction, _interactAction;
-    
+
+    AudioClip walkAudio, jumpAudio, hitAudio, paperAudio;
+    AudioSource mySource;
+    bool walkSoundReady = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,6 +53,27 @@ public class Player : MonoBehaviour
         _jumpAction = _playerInput.actions.FindAction("Jump");
         _dashAction = _playerInput.actions.FindAction("Dash");
         _interactAction = _playerInput.actions.FindAction("Interact");
+
+        StartCoroutine("pairAudio");
+        StartCoroutine("walkSoundQueue");
+    }
+
+    IEnumerator walkSoundQueue()
+    {
+        walkSoundReady = false;
+        yield return new WaitForSeconds(0.25f);
+        walkSoundReady = true;
+    }
+    IEnumerator pairAudio()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GameObject core = GameObject.Find("Core");
+        walkAudio = core.GetComponent<CoreAssetLoader>().walkSound.sound;
+        jumpAudio = core.GetComponent<CoreAssetLoader>().jumpSound.sound;
+        hitAudio = core.GetComponent<CoreAssetLoader>().takeDamageSound.sound;
+        paperAudio = core.GetComponent<CoreAssetLoader>().paperPickupSound.sound;
+
+        mySource = this.AddComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -66,10 +94,23 @@ public class Player : MonoBehaviour
         else if (horizontalVelocity < 0){
             _sprite.flipX = true;
         }
+
+        if(moveValue > 0.02f || moveValue < -0.02f)
+        {
+            if (mySource)
+            {
+                if (walkSoundReady)
+                {
+                    mySource.PlayOneShot(walkAudio);
+                    StartCoroutine("walkSoundQueue");
+                }
+            }
+        }
         
         float verticalVelocity = _rb.velocity.y;
         
         if (_jumpAction.triggered){
+            if (mySource) mySource.PlayOneShot(jumpAudio);
             verticalVelocity = jumpPower;
             _extraGravity = 0;
             _jumpTimer = jumpTime;
@@ -106,12 +147,35 @@ public class Player : MonoBehaviour
         foreach (Collider2D col in colliders){
             FloorNote floorNote;
             if (col.TryGetComponent(out floorNote)){
+                if (mySource) mySource.PlayOneShot(paperAudio);
                 floorNote.DisplayFloorNote();
                 return;
             }
         }
     }
-    
+
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.GetComponent<EnemyRunner>())
+        {
+
+            if (mySource) mySource.PlayOneShot(hitAudio);
+
+            _rb.AddForce(new Vector2(0, 400));
+            _rb.AddTorque(400, ForceMode2D.Force);
+            _collider.enabled = false;
+            GameObject.Find("Main Camera").GetComponent<CameraManager>().enabled = false;
+            StartCoroutine("endGame");
+        }
+    }
+
+    IEnumerator endGame()
+    {
+        yield return new WaitForSeconds(4f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     void OnPause(){
         // Pause Game
         if (Pause != null){

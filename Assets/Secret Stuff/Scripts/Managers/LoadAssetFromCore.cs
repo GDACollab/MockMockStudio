@@ -16,6 +16,7 @@ public class LoadAssetFromCore : MonoBehaviour
 
     SpriteRenderer sprite;
     AudioSource source;
+    [HideInInspector]
     public EnemyLogic script;
 
     public LOADABLE_SPRITES spriteToLoad;
@@ -84,7 +85,6 @@ public class LoadAssetFromCore : MonoBehaviour
         if (loadScript)
         {
             script = x.enemyScript.script;
-            Debug.Log("Loaded: " + x.enemyScript.name);
         }
     }
 
