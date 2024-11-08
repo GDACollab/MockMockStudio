@@ -1,28 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
+    [Header("Health")]
+    [SerializeField] int currentHealth = 3;
+    public int CurrentHealth {get{return currentHealth;}}
+    [SerializeField] int maxHealth = 3;
+    public int MaxHealth {get{return maxHealth;}}
+    
     [Header("Movement")]
     [SerializeField] float groundSpeed = 5f;
+    [SerializeField] float groundAccelerationMultiplier = 2f;
+    [SerializeField] float airAccelerationMultiplier = 0.5f;
     [SerializeField] float jumpHeight = 5f;
     [SerializeField] float jumpTime = 1f;
-    [SerializeField] float calcJumpTime = 0f;
+    [SerializeField] LayerMask groundLayerMask;
     
     [Header("Interaction")]
     [SerializeField] LayerMask interactLayerMask;
     
     float jumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*jumpHeight);
+    // float minJumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*2);
     
-    public Action Pause, Cancel;
+    public Action Pause, Cancel, Die;
     public string currentControlScheme => _playerInput.currentControlScheme;
     public void SwitchCurrentActionMap(string mapNameOrId) => _playerInput.SwitchCurrentActionMap(mapNameOrId);
     
     // Internal Variables
+    bool _isGrounded = false;
     float _jumpTimer = 0f;
     float _extraGravity = 0f;
     
@@ -52,13 +62,24 @@ public class Player : MonoBehaviour
     void Update()
     {
         Movement();
-        calcJumpTime = jumpPower/Physics2D.gravity.magnitude;
+        if (currentHealth <= 0){
+            KillPlayer();
+        }
     }
     
     void Movement(){
+        _isGrounded = Physics2D.BoxCast(transform.position, new Vector2(_collider.size.x*0.99f, 0.1f), 0, -transform.up, _collider.size.y/2, groundLayerMask);
+        
         float moveValue = _moveAction.ReadValue<float>();
         
-        float horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed);
+        float horizontalVelocity = _rb.velocity.x;
+        
+        if (_isGrounded){
+            horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed*groundAccelerationMultiplier);
+        }
+        else if(moveValue != 0){
+            horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed*airAccelerationMultiplier);
+        }
         
         if (horizontalVelocity > 0){
             _sprite.flipX = false;
@@ -69,9 +90,9 @@ public class Player : MonoBehaviour
         
         float verticalVelocity = _rb.velocity.y;
         
-        if (_jumpAction.triggered){
+        if (_jumpAction.triggered && _isGrounded){
             verticalVelocity = jumpPower;
-            _extraGravity = 0;
+            // _extraGravity = 0;
             _jumpTimer = jumpTime;
             // _rb.AddForce(jumpPower * Vector2.up, ForceMode2D.Impulse);
         }
@@ -80,13 +101,9 @@ public class Player : MonoBehaviour
             _jumpTimer -= Time.deltaTime;
         }
         else {
-            _extraGravity = Physics2D.gravity.magnitude;
+            // _extraGravity = Physics2D.gravity.magnitude;
+            verticalVelocity -= Physics2D.gravity.magnitude*Time.deltaTime;
         }
-        // else if (!_jumpAction.inProgress){
-        //     verticalVelocity = jumpPower;
-        // }
-        
-        verticalVelocity -= _extraGravity*Time.deltaTime;
         
         // Horizontal Movement
         _rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
@@ -123,6 +140,12 @@ public class Player : MonoBehaviour
         // Go Back
         if (Cancel != null){
             Cancel();
+        }
+    }
+    
+    public void KillPlayer(){
+        if (Die != null){
+            Die();
         }
     }
 }

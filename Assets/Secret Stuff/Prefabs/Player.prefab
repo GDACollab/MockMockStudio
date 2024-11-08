@@ -234,10 +234,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75c06b763fc5a8d4fbc9aa5e6b47fbb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundSpeed: 5
-  jumpHeight: 3.1
-  jumpTime: 1
-  calcJumpTime: 0
+  currentHealth: 3
+  maxHealth: 3
+  groundSpeed: 7
+  groundAccelerationMultiplier: 1.2
+  airAccelerationMultiplier: 0.25
+  jumpHeight: 4.5
+  jumpTime: 2
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
   interactLayerMask:
     serializedVersion: 2
     m_Bits: 64

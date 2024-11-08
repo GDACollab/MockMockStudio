@@ -42,6 +42,7 @@ public class UIManager : MonoBehaviour
         _player.SwitchCurrentActionMap("Main");
         _player.Pause += Pause;
         _player.Cancel += Back;
+        _player.Die += OnDeath;
     }
 
     // Update is called once per frame
