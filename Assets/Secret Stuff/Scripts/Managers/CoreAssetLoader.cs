@@ -23,7 +23,7 @@ public class CoreAssetLoader : MonoBehaviour
     public struct ScriptLoaded
     {
         public string name;
-        public MonoBehaviour script;
+        public EnemyLogic script;
     }
 
     [HideInInspector]
@@ -67,14 +67,14 @@ public class CoreAssetLoader : MonoBehaviour
 
     void getRandomScript(ref ScriptLoaded outScript, string filePath)
     {
-        var possibleScripts = new Dictionary<String, MonoBehaviour>();
+        var possibleScripts = new Dictionary<String, EnemyLogic>();
 
         foreach (var script in AssetDatabase.FindAssets("t:Script", new[] { filePath }))
         {
             var pathToSprite = AssetDatabase.GUIDToAssetPath(script);
-            UnityEngine.Object foundObject = AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(MonoBehaviour));
+            UnityEngine.Object foundObject = AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(EnemyLogic));
             String name = Path.GetFileNameWithoutExtension(pathToSprite);
-            possibleScripts.Add(name, (MonoBehaviour)foundObject);
+            possibleScripts.Add(name, (EnemyLogic)foundObject);
         }
 
         if (possibleScripts.Count == 0)

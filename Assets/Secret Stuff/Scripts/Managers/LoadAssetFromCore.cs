@@ -5,26 +5,6 @@ using static CoreAssetLoader;
 
 public class LoadAssetFromCore : MonoBehaviour
 {
-
-/*    [HideInInspector]
-    public SpriteLoaded playerSprite;
-    public SpriteLoaded enemySprite;
-    public SpriteLoaded tilesetSprite;
-    public SpriteLoaded noteSprite;
-    public SpriteLoaded backgroundSprite;
-
-    [HideInInspector]
-    public SoundLoaded walkSound;
-    public SoundLoaded backgroundMusic;
-    public SoundLoaded jumpSound;
-    public SoundLoaded paperPickupSound;
-    public SoundLoaded takeDamageSound;
-    public SoundLoaded enemyBarkSound;
-
-    [HideInInspector]
-    public ScriptLoaded enemyScript;*/
-
-
     public enum LOADABLE_SPRITES
     {
         NONE,SPR_PLAYER,SPR_ENEMY,SPR_TILESET,SPR_NOTE,SPR_BACKGROUND
@@ -36,7 +16,7 @@ public class LoadAssetFromCore : MonoBehaviour
 
     SpriteRenderer sprite;
     AudioSource source;
-    MonoBehaviour script;
+    public EnemyLogic script;
 
     public LOADABLE_SPRITES spriteToLoad;
     public LOADABLE_SOUNDS soundToLoad;
