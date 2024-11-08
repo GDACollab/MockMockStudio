@@ -39,6 +39,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        _player.SwitchCurrentActionMap("Main");
         _player.Pause += Pause;
         _player.Cancel += Back;
     }
