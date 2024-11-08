@@ -22,8 +22,7 @@ public class Player : MonoBehaviour
     float jumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*jumpHeight);
     
     public Action Pause, Cancel;
-    public string currentControlScheme => _playerInput.currentControlScheme;
-    public void SwitchCurrentActionMap(string mapNameOrId) => _playerInput.SwitchCurrentActionMap(mapNameOrId);
+
     
     // Internal Variables
     float _jumpTimer = 0f;
@@ -34,7 +33,7 @@ public class Player : MonoBehaviour
     SpriteRenderer _sprite;
     BoxCollider2D _collider;
     
-    PlayerInput _playerInput;
+    public PlayerInput _playerInput;
     InputAction _moveAction, _jumpAction, _dashAction, _interactAction;
 
     AudioClip walkAudio, jumpAudio, hitAudio, paperAudio;

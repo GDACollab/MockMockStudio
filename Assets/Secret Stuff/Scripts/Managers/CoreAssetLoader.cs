@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class CoreAssetLoader : MonoBehaviour
 {
@@ -44,12 +46,21 @@ public class CoreAssetLoader : MonoBehaviour
     [HideInInspector]
     public ScriptLoaded enemyScript;
 
+    private Sprite centerTile;
+    private Sprite cornerTile;
+    private Sprite sideTile;
+    private Sprite sideTwoTile;
+    private Sprite sideThreeTile;
+    private Sprite sideFourTile;
+
+    public RuleTile tile;
+    public Tilemap tilemap;
+
     void Awake()
     {
         // Get Player sprites
         getRandomSprite(ref playerSprite,"Assets/CONTENT/Art/Player");
         getRandomSprite(ref enemySprite, "Assets/CONTENT/Art/Enemy");
-        getRandomSprite(ref tilesetSprite, "Assets/CONTENT/Art/Tilesets");
         getRandomSprite(ref noteSprite, "Assets/CONTENT/Art/Notes");
         getRandomSprite(ref backgroundSprite, "Assets/CONTENT/Art/Background");
 
@@ -62,6 +73,54 @@ public class CoreAssetLoader : MonoBehaviour
 
         // Get programming
         getRandomScript(ref enemyScript, "Assets/CONTENT/Programming");
+
+        string[] folders = AssetDatabase.GetSubFolders("Assets/CONTENT/Art/Tilesets");
+        int folderX = UnityEngine.Random.Range(0, folders.Length);
+
+        string[] sprite = AssetDatabase.FindAssets("Corner_ t:Sprite", new[] { folders[folderX] });
+        var pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        Sprite spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        cornerTile = spriteFound;
+
+        sprite = AssetDatabase.FindAssets("Middle_ t:Sprite", new[] { folders[folderX] });
+        pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        centerTile = spriteFound;
+
+        sprite = AssetDatabase.FindAssets("Side2_ t:Sprite", new[] { folders[folderX] });
+        pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        sideTwoTile = spriteFound;
+
+        sprite = AssetDatabase.FindAssets("Side3_ t:Sprite", new[] { folders[folderX] });
+        pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        sideThreeTile = spriteFound;
+
+        sprite = AssetDatabase.FindAssets("Side4_ t:Sprite", new[] { folders[folderX] });
+        pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        sideFourTile = spriteFound;
+
+        sprite = AssetDatabase.FindAssets("Side_ t:Sprite", new[] { folders[folderX] });
+        pathToSprite = AssetDatabase.GUIDToAssetPath(sprite[0]);
+        spriteFound = (Sprite)AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+        sideTile = spriteFound;
+
+        Sprite[] toAdd = { sideThreeTile, cornerTile, sideTile, sideTwoTile, sideFourTile };
+
+        int i = 0;
+        tile.m_DefaultSprite = centerTile;
+        foreach (var tilerule in tile.m_TilingRules)
+        {
+            if (i < toAdd.Length)
+            {
+                Sprite[] arrr = { toAdd[i] };
+                tilerule.m_Sprites = arrr;
+                i++;
+            }
+        }
+        tilemap.RefreshAllTiles();
     }
 
     void getRandomScript(ref ScriptLoaded outScript, string filePath)

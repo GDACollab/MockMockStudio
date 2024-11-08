@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -39,7 +40,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        _player.SwitchCurrentActionMap("Main");
+        _player._playerInput.SwitchCurrentActionMap("Main");
         _player.Pause += Pause;
         _player.Cancel += Back;
     }
@@ -47,7 +48,7 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(_player.currentControlScheme == "Keyboard"){
+        if(_player._playerInput.currentControlScheme == "Keyboard"){
             keyboardControls.SetActive(true);
             gamepadControls.SetActive(false);
         }
@@ -75,13 +76,13 @@ public class UIManager : MonoBehaviour
     
     void EnableUI(){
         Time.timeScale = 0f;
-        _player.SwitchCurrentActionMap("UI");
+        _player._playerInput.SwitchCurrentActionMap("UI");
         darkBackground.SetActive(true);
     }
     
     void DisableUI(){
         Time.timeScale = 1f;
-        _player.SwitchCurrentActionMap("Main");
+        _player._playerInput.SwitchCurrentActionMap("Main");
         darkBackground.SetActive(false);
     }
     

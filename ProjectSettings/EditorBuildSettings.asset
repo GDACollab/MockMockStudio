@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Secret Stuff/Scenes/MainMenu.unity
     guid: d0df599282d153246bc033bd88fee493
   - enabled: 1
-    path: Assets/Secret Stuff/Scenes/Test Level.unity
-    guid: f08ddc7ee2ce7444fa07e3585fb85b82
+    path: Assets/CONTENT/Design/Scenes/ExampleScene.unity
+    guid: 3671d95719cd64247a18a5f0b411667f
   - enabled: 1
     path: Assets/Secret Stuff/Scenes/End Scene.unity
     guid: b70e8fb08dc7d554c9471d2a7d757953
