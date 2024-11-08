@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -22,22 +21,26 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI title;
     [SerializeField] TextMeshProUGUI body;
     [SerializeField] TextMeshProUGUI author;
+    [SerializeField] Button closeButton;
     [Header("Journal")]
     public Journal journal;
     
     // Internal Variables
     bool _isPaused = false;
     bool _isReading = false;
-    PlayerInput _player;
+    Player _player;
     
     private void Awake() {
         if (!journal){Resources.Load<Journal>("Journal");}
+        journal.CreateFloorNotes();
     }
     
     // Start is called before the first frame update
     void Start()
     {
-        _player = GameObject.FindWithTag("Player").GetComponent<PlayerInput>();
+        _player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        _player.Pause += Pause;
+        _player.Cancel += Back;
     }
 
     // Update is called once per frame
@@ -109,9 +112,10 @@ public class UIManager : MonoBehaviour
         title.text = t;
         body.text = b;
         author.text = "Made By "+a;
+        closeButton.Select();
     }
     
-    void CloseNote(){
+    public void CloseNote(){
         _isReading = false;
         floorNoteDisplayParent.SetActive(false);
         DisableUI();
