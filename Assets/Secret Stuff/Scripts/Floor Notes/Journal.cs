@@ -28,9 +28,9 @@ public class Journal : ScriptableObject
     [SerializeField] private List<FloorNoteObj> floorNotes = new List<FloorNoteObj>();
     private List<FloorNoteObj> _randomNotes = new List<FloorNoteObj>();
 
-    public void CreateFloorNotes()
+    public void CreateFloorNotes(bool force = false)
     {
-        if (!regenerateOnPlay){return;}
+        if (!force && !regenerateOnPlay){return;}
         
         string[] noteNames = AssetDatabase.FindAssets("t:TextAsset", new[] {"Assets/CONTENT/Writing/NotesText"});
         
@@ -84,7 +84,7 @@ public class JournalEditor : Editor
         if (GUILayout.Button("Create Floor Notes"))
         {
             Journal journal = (Journal)target;
-            journal.CreateFloorNotes();
+            journal.CreateFloorNotes(true);
         }
     }
 }

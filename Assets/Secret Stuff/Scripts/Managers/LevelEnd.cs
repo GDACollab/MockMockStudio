@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuManager : MonoBehaviour
+public class LevelEnd : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -17,15 +17,9 @@ public class MainMenuManager : MonoBehaviour
         
     }
     
-    public void StartGame(){
-        SceneManager.LoadScene(1);
-    }
-    
-    public void Quit(){
-        Application.Quit();
-    }
-    
-    public void MainMenu(){
-        SceneManager.LoadScene(0);
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.tag == "Player"){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+        }
     }
 }
