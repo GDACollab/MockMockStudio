@@ -8,34 +8,6 @@ using UnityEngine;
 
 public class CoreAssetLoader : MonoBehaviour
 {
-
-    /*
-     * 
-     * 
-     * TODO on the 8th:
-     * - Make a script generic for enemy behaviour
-     * - Add all things that can load assets
-     * - Add enemy temp behavior and example sounds
-     * 
-     * 
-     * Every play we must load a:
-     * 
-     * Sprites for:
-     * - Tileset, player, enemy, paper note, background sprite
-     * 
-     * Sounds for:
-     * - Jumping, Moving, Taking Damage, Paper Pickup, Random enemy mob noises, msuic track
-     * 
-     * Enemy Script:
-     * - Script
-     * 
-     * AND provide creditation, name is filename?
-     * 
-     * 
-     * Need to scan folder for all assets, then choose one, 
-     */
-
-
     public struct SpriteLoaded
     {
         public string name;
@@ -56,19 +28,40 @@ public class CoreAssetLoader : MonoBehaviour
 
     [HideInInspector]
     public SpriteLoaded playerSprite;
+    public SpriteLoaded enemySprite;
+    public SpriteLoaded tilesetSprite;
+    public SpriteLoaded noteSprite;
+    public SpriteLoaded backgroundSprite;
 
     [HideInInspector]
     public SoundLoaded walkSound;
+    public SoundLoaded backgroundMusic;
+    public SoundLoaded jumpSound;
+    public SoundLoaded paperPickupSound;
+    public SoundLoaded takeDamageSound;
+    public SoundLoaded enemyBarkSound;
 
     [HideInInspector]
     public ScriptLoaded enemyScript;
 
-
     void Awake()
     {
-        // Find our player sprites
-        getRandomSprite(ref playerSprite,"Assets/CONTENT/Art");
-        getRandomSound(ref walkSound, "Assets/CONTENT/Sound");
+        // Get Player sprites
+        getRandomSprite(ref playerSprite,"Assets/CONTENT/Art/Player");
+        getRandomSprite(ref enemySprite, "Assets/CONTENT/Art/Enemy");
+        getRandomSprite(ref tilesetSprite, "Assets/CONTENT/Art/Tilesets");
+        getRandomSprite(ref noteSprite, "Assets/CONTENT/Art/Notes");
+        getRandomSprite(ref backgroundSprite, "Assets/CONTENT/Art/Background");
+
+        // Get Sound effects
+        getRandomSound(ref walkSound, "Assets/CONTENT/Sound/Walk");
+        getRandomSound(ref backgroundMusic, "Assets/CONTENT/Sound/Background Music");
+        getRandomSound(ref jumpSound, "Assets/CONTENT/Sound/Jump");
+        getRandomSound(ref paperPickupSound, "Assets/CONTENT/Sound/Pickup Paper");
+        getRandomSound(ref takeDamageSound, "Assets/CONTENT/Sound/Take Damage");
+        getRandomSound(ref enemyBarkSound, "Assets/CONTENT/Sound/Enemy Bark");
+
+        // Get programming
         getRandomScript(ref enemyScript, "Assets/CONTENT/Programming");
     }
 
