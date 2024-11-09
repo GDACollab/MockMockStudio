@@ -29,7 +29,22 @@ public class EnemyRunner : MonoBehaviour
         enemyRB.gravityScale = 0;
         enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
     }
+    
+    private Vector3 PlayerPos = Vector3.zero;
+    public void EnemyUpdate_Hunter()
+    {
+        enemyRB.gravityScale = 0;
 
+        if (PlayerPos == Vector3.zero || 
+            transform.position == PlayerPos)
+        {
+            PlayerPos = player.transform.position;
+        }
+
+        //Debug.Log(PlayerPos);
+
+        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, PlayerPos, 10f * Time.deltaTime));
+    }
     /// ADD YOUR SCRIPT ABOVE! ------------------------
 
 
@@ -44,6 +59,7 @@ public class EnemyRunner : MonoBehaviour
         /// ADD YOUR SCRIPT BELOW TO ADD!
         list.Add(EnemyUpdate_Example_A);
         list.Add(EnemyUpdate_Example_B);
+        list.Add(EnemyUpdate_Hunter);
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
         var randomIndex = UnityEngine.Random.Range(0, list.Count);
