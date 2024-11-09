@@ -23,6 +23,8 @@ public class EnemyRunner : MonoBehaviour
     {
         enemyRB.gravityScale = 0;
         enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 10f * Time.deltaTime));
+        Instantiate();
+        
     }
     public void EnemyUpdate_Example_B()
     {
