@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Unity.VisualScripting;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -34,6 +34,8 @@ public class CoreAssetLoader : MonoBehaviour
     public SpriteLoaded tilesetSprite;
     public SpriteLoaded noteSprite;
     public SpriteLoaded backgroundSprite;
+    public SpriteLoaded heartFullSprite;
+    public SpriteLoaded heartEmptySprite;
 
     [HideInInspector]
     public SoundLoaded walkSound;
@@ -58,11 +60,14 @@ public class CoreAssetLoader : MonoBehaviour
 
     void Awake()
     {
+        tilemap = GameObject.FindWithTag("Ground").GetComponentInChildren<Tilemap>();
+        
         // Get Player sprites
         getRandomSprite(ref playerSprite,"Assets/CONTENT/Art/Player");
         getRandomSprite(ref enemySprite, "Assets/CONTENT/Art/Enemy");
         getRandomSprite(ref noteSprite, "Assets/CONTENT/Art/Notes");
         getRandomSprite(ref backgroundSprite, "Assets/CONTENT/Art/Background");
+        getRandomHeartSprites(ref heartFullSprite, ref heartEmptySprite, "Assets/CONTENT/Art/Heart");
 
         // Get Sound effects
         getRandomSound(ref walkSound, "Assets/CONTENT/Sound/Walk");
@@ -193,6 +198,49 @@ public class CoreAssetLoader : MonoBehaviour
         int x = UnityEngine.Random.Range(0, possibleSprites.Count);
         outSprite.sprite = possibleSprites.ElementAt(x).Value;
         outSprite.name = possibleSprites.ElementAt(x).Key;
+    }
+    
+    void getRandomHeartSprites(ref SpriteLoaded outSprite1, ref SpriteLoaded outSprite2, string filePath)
+    {
+        var possibleSprites = new Dictionary<String,Sprite>();
+        
+        string[] folders = AssetDatabase.GetSubFolders(filePath);
+        
+        if (folders.Length == 0){
+            Debug.LogError("No heart folders found under" + filePath);
+            return;
+        }
+        
+        int x = UnityEngine.Random.Range(0, folders.Length);
+        string folderPath = folders[x];
+        string[] assets = AssetDatabase.FindAssets("t:Sprite", new[] { folderPath });
+        
+        if (assets.Length == 0){
+            Debug.LogError("No heart sprites found under" + folderPath);
+            return;
+        }
+        else if (assets.Length < 2){
+            Debug.LogWarning("Not enough heart sprites found under" + folderPath);
+            var pathToSprite = AssetDatabase.GUIDToAssetPath(assets[0]);
+            UnityEngine.Object foundObject = AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+            String name = Path.GetFileNameWithoutExtension(pathToSprite);
+            possibleSprites.Add(name, (Sprite)foundObject);
+        }
+        else{
+            foreach (string file in assets){
+                var pathToSprite = AssetDatabase.GUIDToAssetPath(file);
+                if (Regex.Match(pathToSprite.ToLower(), @"\(full\)").Success){
+                    UnityEngine.Object foundObject = AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+                    outSprite1.sprite = (Sprite)foundObject;
+                    outSprite1.name = Path.GetFileNameWithoutExtension(pathToSprite);
+                }
+                else if(Regex.Match(pathToSprite.ToLower(), @"\(empty\)").Success){
+                    UnityEngine.Object foundObject = AssetDatabase.LoadAssetAtPath(pathToSprite, typeof(Sprite));
+                    outSprite2.sprite = (Sprite)foundObject;
+                    outSprite2.name = Path.GetFileNameWithoutExtension(pathToSprite);
+                }
+            }
+        }
     }
 
     // Update is called once per frame

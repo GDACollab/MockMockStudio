@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -35,7 +34,6 @@ public class Player : MonoBehaviour
     // Internal Variables
     bool _isGrounded = false;
     float _jumpTimer = 0f;
-    float _extraGravity = 0f;
     
     // Internal Components
     Rigidbody2D _rb;
@@ -48,6 +46,10 @@ public class Player : MonoBehaviour
     AudioClip walkAudio, jumpAudio, hitAudio, paperAudio;
     AudioSource mySource;
     bool walkSoundReady = false;
+    
+    private void Awake() {
+        _playerInput = GetComponent<PlayerInput>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -56,7 +58,6 @@ public class Player : MonoBehaviour
         _sprite = GetComponentInChildren<SpriteRenderer>();
         _collider = GetComponent<BoxCollider2D>();
         
-        _playerInput = GetComponent<PlayerInput>();
         _moveAction = _playerInput.actions.FindAction("Move");
         _jumpAction = _playerInput.actions.FindAction("Jump");
         _dashAction = _playerInput.actions.FindAction("Dash");
@@ -157,7 +158,7 @@ public class Player : MonoBehaviour
         contactFilter2D.useLayerMask = true;
         contactFilter2D.useTriggers = true;
         
-        int temp = Physics2D.OverlapArea(transform.position+_collider.size.y/2*Vector3.up, end, contactFilter2D, colliders);
+        Physics2D.OverlapArea(transform.position+_collider.size.y/2*Vector3.up, end, contactFilter2D, colliders);
         
         foreach (Collider2D col in colliders){
             FloorNote floorNote;
@@ -173,26 +174,21 @@ public class Player : MonoBehaviour
     {
         if (collision.GetComponent<EnemyRunner>())
         {
+            currentHealth--;
 
             if (mySource) mySource.PlayOneShot(hitAudio);
 
             _rb.AddForce(new Vector2(0, 400));
             _rb.AddTorque(400, ForceMode2D.Force);
-            _collider.enabled = false;
-            GameObject.Find("Main Camera").GetComponent<CameraManager>().enabled = false;
-            StartCoroutine("endGame");
+            if (currentHealth <= 0){
+                KillPlayer();
+            }
         }
-    }
-    
-    IEnumerator endGame()
-    {
-        yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
     void OnPause(){
         // Pause Game
-        if (Pause != null){
+        if (currentHealth > 0 && Pause != null){
             Pause();
         }
     }
@@ -206,7 +202,10 @@ public class Player : MonoBehaviour
     
     public void KillPlayer(){
         if (Die != null){
+            _collider.enabled = false;
+            GameObject.Find("Main Camera").GetComponent<CameraManager>().enabled = false;
             Die();
+            Die = null;
         }
     }
 }
