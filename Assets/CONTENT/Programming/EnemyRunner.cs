@@ -28,7 +28,6 @@ public class EnemyRunner : MonoBehaviour
     //-------- Tyler Variables --------
 
 
-
     /*
      * Please do not modify anything but the sections between the /// comments!
      */
@@ -107,6 +106,12 @@ public class EnemyRunner : MonoBehaviour
     }
     //-------- Tyler Function --------
 
+    public void Liam()
+    {
+        enemyRB.gravityScale = UnityEngine.Random.Range(1,50);
+        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
+    }
+
     /// ADD YOUR SCRIPT ABOVE! ------------------------
 
 
@@ -121,16 +126,20 @@ public class EnemyRunner : MonoBehaviour
         /// ADD YOUR SCRIPT BELOW TO ADD!
         list.Add(EnemyUpdate_Example_A);
         list.Add(EnemyUpdate_Example_B);
+
+        list.Add(Liam);
+
         list.Add(EnemyUpdate_Example_Tyler);
         list.Add(EnemyUpdate_Attack);
         list.Add(EnemyUpdate_Hover);
+
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
         var randomIndex = UnityEngine.Random.Range(0, list.Count);
         randomAction = list[randomIndex];
 
         // Invoke (execute) the action
-        randomAction.Invoke();
+        randomAction.Invoke(); 
     }
     private void Update()
     {
