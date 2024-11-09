@@ -18,16 +18,15 @@ public class EnemyRunner : MonoBehaviour
      * Please do not modify anything but the sections between the /// comments!
      */
 
+    /// ADD YOUR SCRIPT BELOW! ------------------------ <summary>
     /// ADD YOUR SCRIPT BELOW! ------------------------
+    
+    /// makes the size go crzy
     public void EnemyUpdate_Example_A()
     {
         enemyRB.gravityScale = 0;
-        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 10f * Time.deltaTime));
-    }
-    public void EnemyUpdate_Example_B()
-    {
-        enemyRB.gravityScale = 0;
-        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
+        Vector3 small = new Vector3(UnityEngine.Random.Range(0.5f, 1.5f), UnityEngine.Random.Range(0.5f, 1.5f), 1);
+        this.transform.localScale = small;
     }
 
     /// ADD YOUR SCRIPT ABOVE! ------------------------
@@ -43,7 +42,6 @@ public class EnemyRunner : MonoBehaviour
 
         /// ADD YOUR SCRIPT BELOW TO ADD!
         list.Add(EnemyUpdate_Example_A);
-        list.Add(EnemyUpdate_Example_B);
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
         var randomIndex = UnityEngine.Random.Range(0, list.Count);
