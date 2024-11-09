@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 
@@ -9,6 +10,7 @@ public class EnemyRunner : MonoBehaviour
     GameObject player;
     Rigidbody2D enemyRB;
     SpriteRenderer enemySprite;
+    Boolean codeRan = false;
 
     // Internal Logic
     Action randomAction;
@@ -59,6 +61,38 @@ public class EnemyRunner : MonoBehaviour
         enemyRB.gravityScale = 0;
         enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
     }
+
+
+    // Gabe's Code Start
+    public void GabeEnemyUpdate()
+    {
+        // if looking at enemy, it stops
+        enemyRB.gravityScale = 0;
+        Boolean playerSpriteFlipped = player.GetComponentInChildren<SpriteRenderer>().flipX;
+
+        if ((!playerSpriteFlipped && player.transform.position.x > transform.position.x) || (playerSpriteFlipped && player.transform.position.x <= transform.position.x)){
+            enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 7f * Time.deltaTime));
+        }
+    }
+
+    public void AidanEnemyUpdate(){
+        if (!codeRan){
+            codeRan = true;
+            enemyRB.gravityScale = 0;
+            StartCoroutine(teleport());
+        }
+    
+    }
+
+    private IEnumerator teleport(){
+        float speed = 2f;
+        while (true){
+            yield return new WaitForSeconds(speed);
+            enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 500f * Time.deltaTime));
+            speed /= 1.14f;
+        }
+    }
+    // Gabe's Code End
 
     //This function has the enemy walk on the ground. After a bit, it will jump up high, then launch at the player
     public void EnemyUpdate_By_Ashton()
@@ -305,6 +339,7 @@ public class EnemyRunner : MonoBehaviour
 
     }
 
+
     /// ADD YOUR SCRIPT ABOVE! ------------------------
 
 
@@ -319,6 +354,10 @@ public class EnemyRunner : MonoBehaviour
         /// ADD YOUR SCRIPT BELOW TO ADD!
         list.Add(EnemyUpdate_Example_A);
         list.Add(EnemyUpdate_Example_B);
+
+        list.Add(GabeEnemyUpdate);
+        list.Add(AidanEnemyUpdate);
+
 
 
         list.Add(EnemyUpdate_Matt);
@@ -344,6 +383,7 @@ public class EnemyRunner : MonoBehaviour
         list.Add(EnemyUpdate_Example_Tyler);
         list.Add(EnemyUpdate_Attack);
         list.Add(EnemyUpdate_Hover);
+
 
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
