@@ -46,11 +46,11 @@ public class EnemyRunner : MonoBehaviour
 
         if (coinFlip == 0 && transform.localScale.x < maxSize)
         {
-            scaler = new Vector3(0.5F, 0.5F, 0);
+            scaler = new Vector3(0.1F, 0.1F, 0);
         }
         else if (coinFlip == 1 && transform.localScale.x >= maxSize)
         {
-            scaler = new Vector3(-0.5F, -0.5F, 0);
+            scaler = new Vector3(-0.1F, -0.1F, 0);
         }
 
         transform.localScale += scaler;
