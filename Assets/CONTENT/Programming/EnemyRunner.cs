@@ -47,6 +47,11 @@ public class EnemyRunner : MonoBehaviour
         enemyRB.gravityScale = 0;
         enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
     }
+    public void EnemyUpdateUhhh()
+    {
+        enemyRB.gravityScale = -1;
+        enemyRB.MovePosition(new Vector3(UnityEngine.Random.Range(-5f, 5f), UnityEngine.Random.Range(-5f, 5f), UnityEngine.Random.Range(-5f, 5f)));
+    }
 
     public void EnemyUpdate_CiCi()
     {
@@ -156,6 +161,9 @@ public class EnemyRunner : MonoBehaviour
         /// ADD YOUR SCRIPT BELOW TO ADD!
         list.Add(EnemyUpdate_Example_A);
         list.Add(EnemyUpdate_Example_B);
+
+        list.Add(EnemyUpdateUhhh);
+
 
         list.Add(EnemyUpdate_CiCi);
 
