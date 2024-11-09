@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8722489602171249199}
   - component: {fileID: 6303129844461983481}
+  - component: {fileID: 3559833128122919715}
   m_Layer: 0
   m_Name: Core
-  m_TagString: Untagged
+  m_TagString: Core
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42,5 +43,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a3bf013fd2f5c540b5c713304de2b10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: af1465eae7011fd40b911d0c637813d0, type: 2}
+  tilemap: {fileID: 0}
+--- !u!114 &3559833128122919715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3861435637171710984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96220b73f8022b04daf4b11039a8fe44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

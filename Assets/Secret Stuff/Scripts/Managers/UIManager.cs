@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     [Header("General UI")]
+    [SerializeField] Image heart1;
+    [SerializeField] Image heart2;
+    [SerializeField] Image heart3;
+    [SerializeField] Sprite heartFull;
+    [SerializeField] Sprite heartEmpty;
     [SerializeField] GameObject darkBackground;
+    [SerializeField] float gameOverTime = 1f;
     [SerializeField] GameObject gameOver;
     [SerializeField] Button restartButton;
     [Header("Pause UI")]
@@ -30,6 +36,7 @@ public class UIManager : MonoBehaviour
     bool _isPaused = false;
     bool _isReading = false;
     Player _player;
+    Animator _animator;
     
     private void Awake() {
         if (!journal){Resources.Load<Journal>("Journal");}
@@ -40,15 +47,23 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        _player._playerInput.SwitchCurrentActionMap("Main");
+        _player.SwitchCurrentActionMap("Main");
         _player.Pause += Pause;
         _player.Cancel += Back;
+        _player.Die += OnDeath;
+        
+        _animator = GetComponentInChildren<Animator>(true);
+        _animator.speed = 1f/Mathf.Max(0.001f, gameOverTime);
+        
+        CoreAssetLoader core = GameObject.FindWithTag("Core").GetComponent<CoreAssetLoader>();
+        heartFull = core.heartFullSprite.sprite;
+        heartEmpty = core.heartEmptySprite.sprite;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(_player._playerInput.currentControlScheme == "Keyboard"){
+        if(_player.currentControlScheme == "Keyboard"){
             keyboardControls.SetActive(true);
             gamepadControls.SetActive(false);
         }
@@ -56,6 +71,10 @@ public class UIManager : MonoBehaviour
             keyboardControls.SetActive(false);
             gamepadControls.SetActive(true);
         }
+        
+        heart1.sprite = (_player.CurrentHealth>0) ? heartFull : heartEmpty;
+        heart2.sprite = (_player.CurrentHealth>1) ? heartFull : heartEmpty;
+        heart3.sprite = (_player.CurrentHealth>2) ? heartFull : heartEmpty;
     }
     
     void Pause(){
@@ -76,13 +95,13 @@ public class UIManager : MonoBehaviour
     
     void EnableUI(){
         Time.timeScale = 0f;
-        _player._playerInput.SwitchCurrentActionMap("UI");
+        _player.SwitchCurrentActionMap("UI");
         darkBackground.SetActive(true);
     }
     
     void DisableUI(){
         Time.timeScale = 1f;
-        _player._playerInput.SwitchCurrentActionMap("Main");
+        _player.SwitchCurrentActionMap("Main");
         darkBackground.SetActive(false);
     }
     
@@ -96,9 +115,16 @@ public class UIManager : MonoBehaviour
     }
     
     void OnDeath(){
-        EnableUI();
+        _player.SwitchCurrentActionMap("UI");
+        gameOver.transform.position = _player.transform.position;
         gameOver.SetActive(true);
-        restartButton.Select();
+        StartCoroutine(EndGame());
+    }
+    
+    IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(gameOverTime);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
     public void Resume(){

@@ -2,43 +2,54 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class Player : MonoBehaviour
 {
+    [Header("Health")]
+    [SerializeField] int currentHealth = 3;
+    public int CurrentHealth {get{return currentHealth;}}
+    [SerializeField] int maxHealth = 3;
+    public int MaxHealth {get{return maxHealth;}}
+    
     [Header("Movement")]
     [SerializeField] float groundSpeed = 5f;
+    [SerializeField] float groundAccelerationMultiplier = 2f;
+    [SerializeField] float airAccelerationMultiplier = 0.5f;
     [SerializeField] float jumpHeight = 5f;
     [SerializeField] float jumpTime = 1f;
-    [SerializeField] float calcJumpTime = 0f;
+    [SerializeField] LayerMask groundLayerMask;
     
     [Header("Interaction")]
     [SerializeField] LayerMask interactLayerMask;
     
     float jumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*jumpHeight);
+    // float minJumpPower => Mathf.Sqrt(2*Physics2D.gravity.magnitude*2);
     
-    public Action Pause, Cancel;
-
+    public Action Pause, Cancel, Die;
+    public string currentControlScheme => _playerInput.currentControlScheme;
+    public void SwitchCurrentActionMap(string mapNameOrId) => _playerInput.SwitchCurrentActionMap(mapNameOrId);
     
     // Internal Variables
+    bool _isGrounded = false;
     float _jumpTimer = 0f;
-    float _extraGravity = 0f;
     
     // Internal Components
     Rigidbody2D _rb;
     SpriteRenderer _sprite;
     BoxCollider2D _collider;
     
-    public PlayerInput _playerInput;
+    PlayerInput _playerInput;
     InputAction _moveAction, _jumpAction, _dashAction, _interactAction;
-
+    
     AudioClip walkAudio, jumpAudio, hitAudio, paperAudio;
     AudioSource mySource;
     bool walkSoundReady = false;
+    
+    private void Awake() {
+        _playerInput = GetComponent<PlayerInput>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +58,6 @@ public class Player : MonoBehaviour
         _sprite = GetComponentInChildren<SpriteRenderer>();
         _collider = GetComponent<BoxCollider2D>();
         
-        _playerInput = GetComponent<PlayerInput>();
         _moveAction = _playerInput.actions.FindAction("Move");
         _jumpAction = _playerInput.actions.FindAction("Jump");
         _dashAction = _playerInput.actions.FindAction("Dash");
@@ -79,13 +89,24 @@ public class Player : MonoBehaviour
     void Update()
     {
         Movement();
-        calcJumpTime = jumpPower/Physics2D.gravity.magnitude;
+        if (currentHealth <= 0){
+            KillPlayer();
+        }
     }
     
     void Movement(){
+        _isGrounded = Physics2D.BoxCast(transform.position, new Vector2(_collider.size.x*0.99f, 0.1f), 0, -transform.up, _collider.size.y/2, groundLayerMask);
+        
         float moveValue = _moveAction.ReadValue<float>();
         
-        float horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed);
+        float horizontalVelocity = _rb.velocity.x;
+        
+        if (_isGrounded){
+            horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed*groundAccelerationMultiplier);
+        }
+        else if(moveValue != 0){
+            horizontalVelocity = Mathf.MoveTowards(_rb.velocity.x, moveValue*groundSpeed, Time.deltaTime*groundSpeed*airAccelerationMultiplier);
+        }
         
         if (horizontalVelocity > 0){
             _sprite.flipX = false;
@@ -93,7 +114,7 @@ public class Player : MonoBehaviour
         else if (horizontalVelocity < 0){
             _sprite.flipX = true;
         }
-
+        
         if(moveValue > 0.02f || moveValue < -0.02f)
         {
             if (mySource)
@@ -108,10 +129,10 @@ public class Player : MonoBehaviour
         
         float verticalVelocity = _rb.velocity.y;
         
-        if (_jumpAction.triggered){
+        if (_jumpAction.triggered && _isGrounded){
             if (mySource) mySource.PlayOneShot(jumpAudio);
             verticalVelocity = jumpPower;
-            _extraGravity = 0;
+            // _extraGravity = 0;
             _jumpTimer = jumpTime;
             // _rb.AddForce(jumpPower * Vector2.up, ForceMode2D.Impulse);
         }
@@ -120,13 +141,9 @@ public class Player : MonoBehaviour
             _jumpTimer -= Time.deltaTime;
         }
         else {
-            _extraGravity = Physics2D.gravity.magnitude;
+            // _extraGravity = Physics2D.gravity.magnitude;
+            verticalVelocity -= Physics2D.gravity.magnitude*Time.deltaTime;
         }
-        // else if (!_jumpAction.inProgress){
-        //     verticalVelocity = jumpPower;
-        // }
-        
-        verticalVelocity -= _extraGravity*Time.deltaTime;
         
         // Horizontal Movement
         _rb.velocity = new Vector2(horizontalVelocity, verticalVelocity);
@@ -141,7 +158,7 @@ public class Player : MonoBehaviour
         contactFilter2D.useLayerMask = true;
         contactFilter2D.useTriggers = true;
         
-        int temp = Physics2D.OverlapArea(transform.position+_collider.size.y/2*Vector3.up, end, contactFilter2D, colliders);
+        Physics2D.OverlapArea(transform.position+_collider.size.y/2*Vector3.up, end, contactFilter2D, colliders);
         
         foreach (Collider2D col in colliders){
             FloorNote floorNote;
@@ -152,32 +169,26 @@ public class Player : MonoBehaviour
             }
         }
     }
-
-
+    
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.GetComponent<EnemyRunner>())
         {
+            currentHealth--;
 
             if (mySource) mySource.PlayOneShot(hitAudio);
 
             _rb.AddForce(new Vector2(0, 400));
             _rb.AddTorque(400, ForceMode2D.Force);
-            _collider.enabled = false;
-            GameObject.Find("Main Camera").GetComponent<CameraManager>().enabled = false;
-            StartCoroutine("endGame");
+            if (currentHealth <= 0){
+                KillPlayer();
+            }
         }
     }
-
-    IEnumerator endGame()
-    {
-        yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
+    
     void OnPause(){
         // Pause Game
-        if (Pause != null){
+        if (currentHealth > 0 && Pause != null){
             Pause();
         }
     }
@@ -186,6 +197,15 @@ public class Player : MonoBehaviour
         // Go Back
         if (Cancel != null){
             Cancel();
+        }
+    }
+    
+    public void KillPlayer(){
+        if (Die != null){
+            _collider.enabled = false;
+            GameObject.Find("Main Camera").GetComponent<CameraManager>().enabled = false;
+            Die();
+            Die = null;
         }
     }
 }

@@ -5,15 +5,18 @@ TagManager:
   serializedVersion: 2
   tags:
   - UI Manager
+  - Death Plane
+  - Ground
+  - Core
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - Floor Notes
-  - 
+  - Ground
   - 
   - 
   - 
