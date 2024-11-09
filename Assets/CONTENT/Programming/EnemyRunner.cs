@@ -29,7 +29,17 @@ public class EnemyRunner : MonoBehaviour
         enemyRB.gravityScale = 0;
         enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 2f * Time.deltaTime));
     }
-
+    public void EnemyUpdate_A() {
+        enemyRB.gravityScale = 0;
+        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 10f * Time.deltaTime));
+        enemyRB.AddRelativeForce(Vector3.Min(transform.position, player.transform.position));
+        Instantiate(gameObject);
+    }
+    public void EnemyUpdate_B()
+    {
+        enemyRB.gravityScale = 0;
+        enemyRB.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, 10f * Time.deltaTime));
+            }
     /// ADD YOUR SCRIPT ABOVE! ------------------------
 
 
@@ -40,10 +50,10 @@ public class EnemyRunner : MonoBehaviour
         enemySprite = GetComponent<SpriteRenderer>();
 
         var list = new List<Action>();
-
+        
         /// ADD YOUR SCRIPT BELOW TO ADD!
-        list.Add(EnemyUpdate_Example_A);
-        list.Add(EnemyUpdate_Example_B);
+        list.Add(EnemyUpdate_A);
+        list.Add(EnemyUpdate_B);
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
         var randomIndex = UnityEngine.Random.Range(0, list.Count);
