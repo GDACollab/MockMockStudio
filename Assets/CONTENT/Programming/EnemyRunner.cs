@@ -105,8 +105,8 @@ public class EnemyRunner : MonoBehaviour
         var list = new List<Action>();
 
         /// ADD YOUR SCRIPT BELOW TO ADD!
-        //list.Add(EnemyUpdate_Example_A);
-        //list.Add(EnemyUpdate_Example_B);
+        list.Add(EnemyUpdate_Example_A);
+        list.Add(EnemyUpdate_Example_B);
         list.Add(EnemyUpdate_Example_Tyler);
         /// ADD YOUR SCRIPT ABOVE TO ADD!
 
